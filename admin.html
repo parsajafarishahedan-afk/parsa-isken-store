@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>پنل مدیریت</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header><h1>🛠 پنل مدیریت</h1></header>
+  <main class="admin">
+    <h2>افزودن اسکین</h2>
+    <input id="skinName" placeholder="اسم اسکین">
+    <input id="skinCat" placeholder="دسته (مثلا hero)">
+    <input id="skinFile" type="file" accept="image/png">
+    <button id="uploadBtn">آپلود</button>
+
+    <h2>اسکین‌های موجود</h2>
+    <div id="adminList" class="grid"></div>
+  </main>
+
+  <script type="module">
+    import { auth, db, storage } from "./firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { collection, addDoc, getDocs, deleteDoc, doc }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { ref, uploadBytes, getDownloadURL }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+    // فقط ادمین اجازه داره — ایمیل ادمین رو اینجا بذار
+    const ADMIN_EMAIL = "parsa@example.com";
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user || user.email !== ADMIN_EMAIL) {
+        document.body.innerHTML = "<h2 style='text-align:center;padding:3rem'>⛔ دسترسی ندارید</h2>";
+      }
+    });
+
+    document.getElementById("uploadBtn").onclick = async () => {
+      const name = skinName.value.trim();
+      const cat = skinCat.value.trim() || "general";
+      const file = skinFile.files[0];
+      if (!name || !file) return alert("اسم و فایل لازمه");
+
+      const path = `skins/${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, path);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+
+      await addDoc(collection(db, "skins"), {
+        name, category: cat, file: url, createdAt: Date.now()
+      });
+
+      alert("✅ اضافه شد");
+      location.reload();
+    };
+
+    // لیست
+    const list = document.getElementById("adminList");
+    const snap = await getDocs(collection(db, "skins"));
+    snap.forEach(d => {
+      const s = d.data();
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <img src="${s.file}">
+        <div class="info"><div class="name">${s.name}</div>
+        <div class="cat">${s.category}</div></div>
+        <button class="del">🗑 حذف</button>`;
+      card.querySelector(".del").onclick = async () => {
+        if (!confirm("حذف شود؟")) return;
+        await deleteDoc(doc(db, "skins", d.id));
+        card.remove();
+      };
+      list.appendChild(card);
+    });
+  </script>
+</body>
+</html>

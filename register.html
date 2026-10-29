@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>ثبت‌نام | Parsa Isken Store</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header><h1>🎮 ثبت‌نام</h1></header>
+  <main class="auth-box">
+    <input id="email" type="email" placeholder="ایمیل">
+    <input id="pass" type="password" placeholder="رمز (حداقل ۶ کاراکتر)">
+    <button onclick="registerUser(email.value, pass.value)">ثبت‌نام</button>
+    <p>حساب داری؟ <a href="login.html">ورود</a></p>
+  </main>
+  <script type="module" src="auth.js"></script>
+  <script>
+    // برای دسترسی به توابع window
+    document.querySelector("button").addEventListener("click", () => {});
+  </script>
+</body>
+</html>

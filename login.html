@@ -1,1 +1,27 @@
 
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ورود | Parsa Isken Store</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header><h1>🔑 ورود</h1></header>
+  <main class="auth-box">
+    <input id="email" type="email" placeholder="ایمیل" autocomplete="email">
+    <input id="pass" type="password" placeholder="رمز" autocomplete="current-password">
+    <button id="btn">ورود</button>
+    <p>حساب نداری؟ <a href="register.html">ثبت‌نام</a></p>
+  </main>
+  <script type="module">
+    import { loginUser } from "./auth.js";
+    document.getElementById("btn").onclick = () => {
+      const e = email.value.trim(), p = pass.value;
+      if (!e || !p) return alert("ایمیل و رمز لازمه");
+      loginUser(e, p);
+    };
+  </script>
+</body>
+</html>
